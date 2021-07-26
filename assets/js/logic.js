@@ -29,25 +29,25 @@ function showQuestion() {
     screenFeedback.style.display = "none";
     quizQuestion.innerHTML = arrayQuestions[intQuestion].title;
 
-    var h3 = document.createElement("h3");
-    h3.textContent = arrayQuestions[intQuestion].choice1;
-    h3.setAttribute("id", "choice1");
-    quizChoices.appendChild(h3);
+    var button = document.createElement("button");
+    button.textContent = arrayQuestions[intQuestion].choice1;
+    button.setAttribute("id", "choice1");
+    quizChoices.appendChild(button);
 
-    var h3 = document.createElement("h3");
-    h3.textContent = arrayQuestions[intQuestion].choice2;
-    h3.setAttribute("id", "choice2");
-    quizChoices.appendChild(h3);
+    var button = document.createElement("button");
+    button.textContent = arrayQuestions[intQuestion].choice2;
+    button.setAttribute("id", "choice2");
+    quizChoices.appendChild(button);
 
-    var h3 = document.createElement("h3");
-    h3.textContent = arrayQuestions[intQuestion].choice3;
-    h3.setAttribute("id", "choice3");
-    quizChoices.appendChild(h3);
+    var button = document.createElement("button");
+    button.textContent = arrayQuestions[intQuestion].choice3;
+    button.setAttribute("id", "choice3");
+    quizChoices.appendChild(button);
 
-    var h3 = document.createElement("h3");
-    h3.textContent = arrayQuestions[intQuestion].choice4;
-    h3.setAttribute("id", "choice4");
-    quizChoices.appendChild(h3); 
+    var button = document.createElement("button");
+    button.textContent = arrayQuestions[intQuestion].choice4;
+    button.setAttribute("id", "choice4");
+    quizChoices.appendChild(button);
     }           
 }
 
@@ -56,10 +56,14 @@ function checkAnswer(choiceNumber){
     
     if (choiceNumber===arrayQuestions[intQuestion].correct) {
         screenFeedback.textContent = "Correct!";
+        var snd = new Audio("./assets/sfx/correct.wav");
+        snd.play();        
     }
     else {
         screenFeedback.textContent = "Wrong!";
         secondsLeft = secondsLeft -10;
+        var snd = new Audio("./assets/sfx/incorrect.wav");
+        snd.play();
     } 
 
     // wait 1 second.
@@ -74,11 +78,11 @@ function checkAnswer(choiceNumber){
 }
 
 function sendMessage() {
-    var score = secondsLeft;
+   // var score = secondsLeft;
     screenQuestions.style.display = "none";
     screenFeedback.style.display = "none";
     screenEnd.style.display = "block";
-    finalScore.textContent = score;
+    finalScore.textContent = secondsLeft;
 }
 
 
@@ -93,24 +97,43 @@ buttonStart.addEventListener("click", function() {
 
 document.addEventListener('click',function(e){
     if(e.target && e.target.id== 'choice1'){
-          checkAnswer("1");
-     }
+        checkAnswer("1");
+    }
+    else if(e.target && e.target.id== 'choice2'){
+        checkAnswer("2");
+    }
+    else if(e.target && e.target.id== 'choice3'){
+        checkAnswer("3");
+    }
+    else if(e.target && e.target.id== 'choice4'){
+        checkAnswer("4");
+    }
  });
 
- document.addEventListener('click',function(e){
-    if(e.target && e.target.id== 'choice2'){
-          checkAnswer("2");
-     }
- });
+var initialsInput = document.querySelector("#initials");
+var submitButton = document.querySelector("#submit");
+var highscores = [];
+var json_scores = JSON.parse(localStorage.getItem("highscores"));
 
- document.addEventListener('click',function(e){
-    if(e.target && e.target.id== 'choice3'){
-          checkAnswer("3");
-     }
- });
+submitButton.addEventListener("click", function(event) {
+  event.preventDefault();
+  
+  // create highscores object from submission
+  var scoreObject = {
+    initials: initialsInput.value.trim(),
+    score: secondsLeft,
+  };
+  highscores.push(scoreObject);
 
- document.addEventListener('click',function(e){
-    if(e.target && e.target.id== 'choice4'){
-          checkAnswer("4");
-     }
- });
+  for(var i in json_scores) {
+    scoreObject = {
+        initials: json_scores [i].initials,
+        score: json_scores [i].score,
+    };      
+    highscores.push(scoreObject);
+  }
+
+    // set new submission
+    localStorage.setItem("highscores", JSON.stringify(highscores));
+    window.location.href = 'highscores.html';
+});
